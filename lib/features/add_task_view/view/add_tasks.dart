@@ -42,6 +42,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 return null;
               },
             ),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _descriptionController,
               decoration: const InputDecoration(labelText: 'Description'),
@@ -60,7 +61,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   final description = _descriptionController.text.trim();
                   final category = categoryViewModel.selectedCategory;
 
-                  addTaskViewModel.postTask(
+                  await addTaskViewModel.postTask(
                     title: title,
                     description: description,
                     category: category,

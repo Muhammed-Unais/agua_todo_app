@@ -7,7 +7,6 @@ import 'package:agua_todo_app/features/home/view_model/home_view_model.dart';
 
 class AddTaskViewModel with ChangeNotifier {
   final _addTaskRepo = AddTaskLocalRepository(LocalDataService());
-  TextEditingController taskTextEditingController = TextEditingController();
   bool postIsLoading = false;
 
   void setPostTasks(bool isLoading) {
@@ -22,6 +21,8 @@ class AddTaskViewModel with ChangeNotifier {
     required bool status,
     required BuildContext context,
   }) async {
+    final homeViewmodel = context.read<HomeViewModel>();
+
     setPostTasks(true);
     final taskModel = TaskModel(
       title: title,
@@ -29,11 +30,20 @@ class AddTaskViewModel with ChangeNotifier {
       category: category,
       status: status,
     );
+
+    if (homeViewmodel.isDuplicate(taskModel)) {
+      // TODO show a snackBar
+
+      return;
+    }
     _addTaskRepo.postTask(taskModel).then((value) {
       if (!context.mounted) return;
       context.read<HomeViewModel>().getAllTask();
       setPostTasks(false);
-      taskTextEditingController.clear();
+
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
     }).onError(
       (error, stackTrace) {
         setPostTasks(false);
@@ -50,18 +60,23 @@ class AddTaskViewModel with ChangeNotifier {
     String? category,
     bool? status,
   }) async {
+    final homeViewmodel = context.read<HomeViewModel>();
+
     final newTaskModel = taskModel.copyWith(
       category: category,
       title: title,
       description: description,
       status: status,
     );
+
+    if (homeViewmodel.isDuplicate(newTaskModel)) {
+      // TODO show a snackBar
+      return;
+    }
     _addTaskRepo.editTask(index, newTaskModel).then((value) {
       if (!context.mounted) return;
 
-      context.read<HomeViewModel>().getAllTask();
-
-      taskTextEditingController.clear();
+      homeViewmodel.getAllTask();
     }).onError(
       (error, stackTrace) {},
     );

@@ -1,17 +1,12 @@
+import 'package:agua_todo_app/features/home/repository/task_manupulate_local_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:agua_todo_app/data/local_data_service/local_data_service.dart';
 import 'package:agua_todo_app/data/response/local_sevice_response.dart';
 import 'package:agua_todo_app/features/home/model/task_model.dart';
-import 'package:agua_todo_app/features/home/repository/delete_repo.dart';
-import 'package:agua_todo_app/features/home/repository/get_tasks_repository.dart';
-import 'package:agua_todo_app/features/home/repository/task_complete_repository.dart';
 
 class HomeViewModel with ChangeNotifier {
-  final _myGetAllTaskRepo =
-      GetTasksRepository(baseLocalDataService: LocalDataService());
-  final _myDeleteTaskRepo =
-      DeleteRepo(baseLocalDataService: LocalDataService());
-  final _myTaskCompletionRepo = TaskCompleteRepository(LocalDataService());
+  final _taskManupulationRepo =
+      TaskManupulateLocalRepository(baseLocalDataService: LocalDataService());
   LocalServiceResponse<List<TaskModel>> getAllTaskResponse =
       LocalServiceResponse.loading();
   bool postIsLoading = false;
@@ -36,7 +31,7 @@ class HomeViewModel with ChangeNotifier {
   void getAllTask() async {
     setGetAllTasks(LocalServiceResponse.loading());
 
-    await _myGetAllTaskRepo.getAllTaskRepository().then((value) {
+    await _taskManupulationRepo.getAllTaskRepository().then((value) {
       setGetAllTasks(LocalServiceResponse.completed(value));
     }).onError(
       (error, stackTrace) {
@@ -47,7 +42,7 @@ class HomeViewModel with ChangeNotifier {
 
   void deleteTask(int index) async {
     setDeleteTasks(true);
-    await _myDeleteTaskRepo.deleteTask(index).then((value) {
+    await _taskManupulationRepo.deleteTask(index).then((value) {
       getAllTask();
       setDeleteTasks(false);
     }).onError(
@@ -64,11 +59,21 @@ class HomeViewModel with ChangeNotifier {
   ) async {
     var newtaskModel = taskModel.copyWith(status: status);
 
-    await _myTaskCompletionRepo
+    await _taskManupulationRepo
         .updateTaskCompletion(index, newtaskModel)
         .then((value) {
-      getAllTask();
+      var tasks = getAllTaskResponse.data ?? [];
+
+      tasks.removeAt(index);
+      tasks.add(newtaskModel);
+
+      setGetAllTasks(LocalServiceResponse.completed(tasks));
     }).onError((error, stackTrace) {});
+  }
+
+  bool isDuplicate(TaskModel task) {
+    final tasks = getAllTaskResponse.data ?? [];
+    return tasks.any((element) => element == task);
   }
 
   Map<String, List<TaskModel>> get tasksByCategory {
@@ -84,6 +89,16 @@ class HomeViewModel with ChangeNotifier {
       grouped[cat]!.add(task);
     }
     return grouped;
+  }
+
+  int get totalTasksCount => getAllTaskResponse.data?.length ?? 0;
+
+  int get completedTasksCount =>
+      getAllTaskResponse.data?.where((task) => task.status).length ?? 0;
+
+  double get progress {
+    if (totalTasksCount == 0) return 0.0;
+    return completedTasksCount / totalTasksCount;
   }
 
   HomeViewModel() {
