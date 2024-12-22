@@ -88,7 +88,7 @@ class ThemeProvider with ChangeNotifier {
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: colorScheme.primary),
         ),
-        labelStyle: TextStyle(color: colorScheme.surface),
+        labelStyle: const TextStyle(color: Colors.black),
       ),
 
       // Switches, checkboxes, radio

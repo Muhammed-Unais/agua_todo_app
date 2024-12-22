@@ -43,14 +43,16 @@ class MyApp extends StatelessWidget {
           create: (context) => ThemeProvider(),
         )
       ],
-      child: Consumer<ThemeProvider>(builder: (context, value, _) {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Flutter Demo',
-          theme: value.currentTheme,
-          home: const HomePage(),
-        );
-      }),
+      child: Consumer<ThemeProvider>(
+        builder: (context, value, _) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Flutter Demo',
+            theme: value.currentTheme,
+            home: const HomePage(),
+          );
+        },
+      ),
     );
   }
 }
