@@ -73,11 +73,42 @@ class AddTaskViewModel with ChangeNotifier {
       // TODO show a snackBar
       return;
     }
-    _addTaskRepo.editTask(index, newTaskModel).then((value) {
-      if (!context.mounted) return;
+    _addTaskRepo.editTask(index, newTaskModel).then(
+      (value) {
+        homeViewmodel.getAllTask();
+      },
+    ).onError(
+      (error, stackTrace) {},
+    );
+  }
 
-      homeViewmodel.getAllTask();
-    }).onError(
+  Future<void> insertAt(
+    int index,
+    TaskModel taskModel,
+    BuildContext context, {
+    String? title,
+    String? description,
+    String? category,
+    bool? status,
+  }) async {
+    final homeViewmodel = context.read<HomeViewModel>();
+
+    final newTaskModel = taskModel.copyWith(
+      category: category,
+      title: title,
+      description: description,
+      status: status,
+    );
+
+    if (homeViewmodel.isDuplicate(newTaskModel)) {
+      // TODO show a snackBar
+      return;
+    }
+    _addTaskRepo.editTask(index, newTaskModel).then(
+      (value) {
+        homeViewmodel.getAllTask();
+      },
+    ).onError(
       (error, stackTrace) {},
     );
   }

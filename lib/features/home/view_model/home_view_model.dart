@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:agua_todo_app/features/home/repository/task_manupulate_local_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:agua_todo_app/data/local_data_service/local_data_service.dart';
@@ -40,10 +42,24 @@ class HomeViewModel with ChangeNotifier {
     );
   }
 
+  void undoDeletedMessage(TaskModel deletedTask, int dTaskindex) async {
+    try {
+      final currentTaskList = getAllTaskResponse.data;
+      currentTaskList?.insert(dTaskindex, deletedTask);
+      setGetAllTasks(LocalServiceResponse.completed(currentTaskList));
+      _taskManupulationRepo.postTask(deletedTask);
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
   void deleteTask(int index) async {
     setDeleteTasks(true);
+
     await _taskManupulationRepo.deleteTask(index).then((value) {
-      getAllTask();
+      final currentTaskList = getAllTaskResponse.data;
+      currentTaskList?.removeAt(index);
+      setGetAllTasks(LocalServiceResponse.completed(currentTaskList));
       setDeleteTasks(false);
     }).onError(
       (error, stackTrace) {

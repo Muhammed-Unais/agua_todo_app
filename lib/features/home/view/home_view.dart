@@ -153,15 +153,10 @@ class HomePage extends StatelessWidget {
                                               label: "Undo",
                                               onPressed: () {
                                                 final addViewModel = context
-                                                    .read<AddTaskViewModel>();
+                                                    .read<HomeViewModel>();
 
-                                                addViewModel.postTask(
-                                                  category: task.category,
-                                                  context: context,
-                                                  description: task.category,
-                                                  status: task.status,
-                                                  title: task.title,
-                                                );
+                                                addViewModel.undoDeletedMessage(
+                                                    task, absoluteIndex ?? 0);
                                               },
                                             ),
                                           ),

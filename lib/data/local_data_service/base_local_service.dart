@@ -6,4 +6,5 @@ abstract interface class BaseLocalDataService {
   Future<void> putData(int index, TaskModel taskModel);
   Future<void> deleteData(int index);
   dynamic getAt(int index);
+  Future<void> addAll(List<TaskModel> tasks);
 }

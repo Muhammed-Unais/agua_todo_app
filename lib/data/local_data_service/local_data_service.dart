@@ -15,8 +15,6 @@ class LocalDataService implements BaseLocalDataService {
     try {
       await taskBox.add(taskModel);
     } catch (e) {
-      log(e.toString());
-
       throw e.toString();
     }
   }
@@ -42,5 +40,14 @@ class LocalDataService implements BaseLocalDataService {
   @override
   TaskModel? getAt(int index) {
     return taskBox.getAt(index);
+  }
+
+  @override
+  Future<void> addAll(List<TaskModel> tasks) async {
+    try {
+      await taskBox.addAll(tasks);
+    } catch (e) {
+      throw e.toString();
+    }
   }
 }
